@@ -3,7 +3,9 @@ const Appointment = require('../models/index');
 exports.getAvailableSlots = async (req, res) => {
   try {
     const { date } = req.query;
+    console.log(date, "date")
     const availableSlots = await Appointment.findAvailableSlots(date);
+    console.log("🚀 ~ exports.getAvailableSlots= ~ availableSlots:", availableSlots)
     res.json(availableSlots);
   } catch (error) {
     res.status(500).json({ error: error.message });

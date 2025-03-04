@@ -20,6 +20,7 @@ app.use(express.static(path.join(__dirname, '../frontend'), {
   }));
 
   const routes = require("./routes/index")
+  app.use('/api/appointments', routes);
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
   });  

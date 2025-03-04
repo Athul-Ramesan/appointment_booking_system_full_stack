@@ -15,11 +15,13 @@ class Appointment {
                     reject(err)
                 }
 
-                const allSlots = require('./utils/timeSlots').generateTimeSlots()
-                const availabeSlots = allSlots.filter(slot =>{
-                    !bookedSlots.some(booked=> booked.time_slot === slot)
-                });
-                resolve(availabeSlots)
+                const allSlots = require('../utils/timeSlots').generateTimeSlots()
+                console.log("🚀 ~ Appointment ~ db.all ~ allSlots:", allSlots)
+                const availableSlots = allSlots.filter(slot => 
+                    !bookedSlots.some(booked => booked.time_slot === slot)
+                );
+                
+                resolve(availableSlots)
             })
         })
     }

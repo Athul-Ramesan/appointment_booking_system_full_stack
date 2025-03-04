@@ -1,45 +1,67 @@
 (function() {
     class AppointmentBookingPlugin {
-      constructor(apiBaseUrl) {
-        this.apiBaseUrl = apiBaseUrl || 'http://localhost:3000/api/appointments';
+      constructor(apiBaseUrl = 'http://localhost:3000/api/appointments') {
+        this.apiBaseUrl = apiBaseUrl;
         this.initializeDOM();
         this.attachEventListeners();
       }
   
       initializeDOM() {
-        this.container = document.createElement('div');
-        this.container.className = 'booking-plugin-container';
-        this.container.innerHTML = `
-          <form class="booking-plugin-form">
-            <input type="text" name="name" placeholder="Full Name" required>
-            <input type="tel" name="phone" placeholder="Phone Number" required>
-            <input type="date" name="date" required>
-            <div class="booking-plugin-slots" id="availableSlots"></div>
-            <input type="hidden" name="timeSlot">
-            <button type="submit">Book Appointment</button>
-          </form>
-          <div id="bookingMessage" class="booking-plugin-message"></div>
-        `;
-        document.body.appendChild(this.container);
+        // Create a container div if it doesn't exist
+        if (!document.getElementById('appointment-booking-container')) {
+          const container = document.createElement('div');
+          container.id = 'appointment-booking-container';
+          container.innerHTML = `
+            <div class="booking-plugin-container">
+              <h2>Book an Appointment</h2>
+              <form class="booking-plugin-form">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                <input type="date" name="date" required>
+                <div class="booking-plugin-slots" id="availableSlots"></div>
+                <input type="hidden" name="timeSlot">
+                <button type="submit">Book Appointment</button>
+              </form>
+              <div id="bookingMessage" class="booking-plugin-message"></div>
+            </div>
+          `;
+          
+          // Append to body or a specific container in your page
+          document.body.appendChild(container);
+        }
       }
   
       attachEventListeners() {
-        const form = this.container.querySelector('form');
+        const form = document.querySelector('.booking-plugin-form');
         const dateInput = form.querySelector('input[name="date"]');
-        const slotsContainer = this.container.querySelector('#availableSlots');
-        const messageContainer = this.container.querySelector('#bookingMessage');
+        const slotsContainer = document.getElementById('availableSlots');
+        const messageContainer = document.getElementById('bookingMessage');
   
-        dateInput.addEventListener('change', () => this.fetchAvailableSlots(dateInput.value));
-  
-        slotsContainer.addEventListener('click', (e) => {
-          if (e.target.classList.contains('booking-plugin-slot')) {
-            const slots = slotsContainer.querySelectorAll('.booking-plugin-slot');
-            slots.forEach(slot => slot.classList.remove('selected'));
-            e.target.classList.add('selected');
-            form.querySelector('input[name="timeSlot"]').value = e.target.dataset.slot;
-          }
+        // Fetch slots when date changes
+        dateInput.addEventListener('change', (e) => {
+          const selectedDate = e.target.value;
+          this.fetchAvailableSlots(selectedDate);
         });
   
+        // Select slot functionality
+        slotsContainer.addEventListener('click', (e) => {
+            const clickedSlot = e.target.closest('.booking-plugin-slot');
+            if (!clickedSlot) return; // Ignore clicks outside of slots
+          
+            // Remove selection from all slots
+            document.querySelectorAll('.booking-plugin-slot').forEach(slot => {
+              slot.classList.remove('selected');
+            });
+          
+            // Add selection to clicked slot
+            clickedSlot.classList.add('selected');
+          
+            // Set selected time slot
+            form.querySelector('input[name="timeSlot"]').value = clickedSlot.dataset.slot;
+          });
+          
+  
+        // Form submission
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           this.bookAppointment(new FormData(form));
@@ -47,23 +69,42 @@
       }
   
       async fetchAvailableSlots(date) {
-        const slotsContainer = this.container.querySelector('#availableSlots');
+        const slotsContainer = document.getElementById('availableSlots');
         slotsContainer.innerHTML = 'Loading slots...';
   
         try {
           const response = await fetch(`${this.apiBaseUrl}/available-slots?date=${date}`);
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch slots');
+          }
+          
           const slots = await response.json();
   
-          slotsContainer.innerHTML = slots.map(slot => 
-            `<div class="booking-plugin-slot" data-slot="${slot}">${slot}</div>`
-          ).join('');
+          // Clear previous slots
+          slotsContainer.innerHTML = '';
+  
+          // Create slot elements
+          console.log(slots,"slotsssssssss")
+          if (slots.length === 0) {
+            slotsContainer.innerHTML = 'No available slots for this date.';
+          } else {
+            slots.forEach(slot => {
+              const slotElement = document.createElement('div');
+              slotElement.classList.add('booking-plugin-slot');
+              slotElement.dataset.slot = slot;
+              slotElement.textContent = slot;
+              slotsContainer.appendChild(slotElement);
+            });
+          }
         } catch (error) {
-          slotsContainer.innerHTML = 'Error fetching slots';
+          console.error('Error fetching slots:', error);
+          slotsContainer.innerHTML = 'Error fetching available slots. Please try again.';
         }
       }
   
       async bookAppointment(formData) {
-        const messageContainer = this.container.querySelector('#bookingMessage');
+        const messageContainer = document.getElementById('bookingMessage');
         messageContainer.innerHTML = '';
         messageContainer.className = 'booking-plugin-message';
   
@@ -81,17 +122,22 @@
           if (response.ok) {
             messageContainer.classList.add('success');
             messageContainer.innerHTML = 'Appointment booked successfully!';
-            this.container.querySelector('form').reset();
+            
+            // Reset form
+            document.querySelector('.booking-plugin-form').reset();
+            document.getElementById('availableSlots').innerHTML = '';
           } else {
             messageContainer.classList.add('error');
             messageContainer.innerHTML = result.error || 'Booking failed';
           }
         } catch (error) {
+          console.error('Booking error:', error);
           messageContainer.classList.add('error');
           messageContainer.innerHTML = 'Network error. Please try again.';
         }
       }
     }
   
+    // Expose the plugin to global scope
     window.AppointmentBookingPlugin = AppointmentBookingPlugin;
   })();

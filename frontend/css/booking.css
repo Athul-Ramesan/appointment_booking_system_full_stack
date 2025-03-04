@@ -38,6 +38,11 @@
     background-color: #cccccc;
     cursor: not-allowed;
   }
+  .booking-plugin-slot.selected {
+    background-color: #2E7D32; /* Darker green */
+    border: 2px solid #FFF; /* White border for contrast */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  }
   
   .booking-plugin-message {
     margin-top: 15px;
