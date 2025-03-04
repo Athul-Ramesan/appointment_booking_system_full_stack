@@ -7,7 +7,6 @@
       }
   
       initializeDOM() {
-        // Create a container div if it doesn't exist
         if (!document.getElementById('appointment-booking-container')) {
           const container = document.createElement('div');
           container.id = 'appointment-booking-container';
@@ -26,7 +25,6 @@
             </div>
           `;
           
-          // Append to body or a specific container in your page
           document.body.appendChild(container);
         }
       }
@@ -37,31 +35,25 @@
         const slotsContainer = document.getElementById('availableSlots');
         const messageContainer = document.getElementById('bookingMessage');
   
-        // Fetch slots when date changes
         dateInput.addEventListener('change', (e) => {
           const selectedDate = e.target.value;
           this.fetchAvailableSlots(selectedDate);
         });
   
-        // Select slot functionality
         slotsContainer.addEventListener('click', (e) => {
             const clickedSlot = e.target.closest('.booking-plugin-slot');
-            if (!clickedSlot) return; // Ignore clicks outside of slots
+            if (!clickedSlot) return; 
           
-            // Remove selection from all slots
             document.querySelectorAll('.booking-plugin-slot').forEach(slot => {
               slot.classList.remove('selected');
             });
           
-            // Add selection to clicked slot
             clickedSlot.classList.add('selected');
           
-            // Set selected time slot
             form.querySelector('input[name="timeSlot"]').value = clickedSlot.dataset.slot;
           });
           
   
-        // Form submission
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           this.bookAppointment(new FormData(form));
@@ -81,10 +73,8 @@
           
           const slots = await response.json();
   
-          // Clear previous slots
           slotsContainer.innerHTML = '';
   
-          // Create slot elements
           console.log(slots,"slotsssssssss")
           if (slots.length === 0) {
             slotsContainer.innerHTML = 'No available slots for this date.';
@@ -123,7 +113,6 @@
             messageContainer.classList.add('success');
             messageContainer.innerHTML = 'Appointment booked successfully!';
             
-            // Reset form
             document.querySelector('.booking-plugin-form').reset();
             document.getElementById('availableSlots').innerHTML = '';
           } else {
@@ -138,6 +127,5 @@
       }
     }
   
-    // Expose the plugin to global scope
     window.AppointmentBookingPlugin = AppointmentBookingPlugin;
   })();
