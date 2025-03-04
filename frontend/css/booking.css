@@ -1,0 +1,56 @@
+.booking-plugin-container {
+    max-width: 500px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  .booking-plugin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .booking-plugin-form input,
+  .booking-plugin-form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .booking-plugin-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .booking-plugin-slot {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .booking-plugin-slot.booked {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .booking-plugin-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .booking-plugin-message.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+  }
+  
+  .booking-plugin-message.error {
+    background-color: #f2dede;
+    color: #a94442;
+  }
